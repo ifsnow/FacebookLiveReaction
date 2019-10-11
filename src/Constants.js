@@ -1,15 +1,9 @@
 // @flow
 
-import {
-  Dimensions,
-  StatusBar,
-  Platform,
-} from 'react-native';
+import { Dimensions, Platform } from 'react-native';
+import DeviceInfo from 'react-native-device-info';
 
-const {
-  width: WINDOW_WIDTH,
-  height,
-} = Dimensions.get('window');
+const { width: WINDOW_WIDTH, height } = Dimensions.get('window');
 
 const IS_ANDROID = Platform.OS === 'android';
 
@@ -17,11 +11,13 @@ const IS_IOS = !IS_ANDROID;
 
 const IS_OVER_IPHONEX = IS_IOS && !Platform.isPad && !Platform.isTVOS && height >= 812;
 
-const WINDOW_HEIGHT = height - (IS_ANDROID ? StatusBar.currentHeight : 0);
+const WINDOW_HEIGHT = height;
 
 const VIDEO_PLAYER_HEIGHT = parseInt(WINDOW_HEIGHT * 0.625, 10);
 
 const COMMENTS_HEIGHT = WINDOW_HEIGHT - VIDEO_PLAYER_HEIGHT;
+
+const WITH_NOTCH = DeviceInfo.hasNotch();
 
 const REACTIONS = {
   LIKE: require('./assets/reaction-like.png'),
@@ -39,4 +35,5 @@ export {
   WINDOW_HEIGHT,
   VIDEO_PLAYER_HEIGHT,
   COMMENTS_HEIGHT,
+  WITH_NOTCH,
 };
