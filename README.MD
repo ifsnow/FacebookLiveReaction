@@ -6,7 +6,9 @@ Check out what's new here : https://react-native.toys
 
 ### Features
 
-![Working Gif](https://gph.is/g/Zdolzr8 "Demo Gif")
+## Demo Gif
+
+![](demo.gif)
 
 1. Prototype : Contains basic UI/UX.
 2. iOS / Android : Works on all platforms.
