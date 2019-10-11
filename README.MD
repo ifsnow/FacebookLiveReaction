@@ -4,12 +4,11 @@ Check out what's new here : https://react-native.toys
 
 ## Facebook Live Reaction
 
-### Features
-
 ## Demo Gif
 
 ![](demo.gif)
 
+### Features
 1. Prototype : Contains basic UI/UX.
 2. iOS / Android : Works on all platforms.
 3. Free : Really free. No license.
