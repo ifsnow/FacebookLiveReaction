@@ -6,7 +6,7 @@ Check out what's new here : https://react-native.toys
 
 ### Features
 
-![Working Gif](https://media.giphy.com/media/QsJUxan0BJT23uN69h/giphy.gif "Demo Gif")
+![Working Gif](https://gph.is/g/Zdolzr8 "Demo Gif")
 
 1. Prototype : Contains basic UI/UX.
 2. iOS / Android : Works on all platforms.
