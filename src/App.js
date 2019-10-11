@@ -137,7 +137,7 @@ export default class App extends PureComponent<Props, State> {
     if (IS_IOS && WITH_NOTCH) {
       return (
         <StatusBar
-          translucent
+          // translucent
           backgroundColor="#000"
           barStyle="light-content"
         />
