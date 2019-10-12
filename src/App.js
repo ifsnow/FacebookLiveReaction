@@ -1,38 +1,25 @@
 // @flow
 
-import React, { PureComponent } from 'react';
+import React, { PureComponent, Fragment } from 'react';
 import {
-  StyleSheet,
-  View,
-  Keyboard,
+  StyleSheet, View, Keyboard, StatusBar,
 } from 'react-native';
-
+import SafeAreaView from 'react-native-safe-area-view';
 import {
-  VideoPlayer,
-  Comments,
-  CommentForm,
-  Reactions,
+  VideoPlayer, Comments, CommentForm, Reactions,
 } from '~/views';
 
-import CommentStore, {
-  type CommentType,
-} from '~/stores/CommentStore';
+import CommentStore, { type CommentType } from '~/stores/CommentStore';
 
-import ReactionStore, {
-  type ReactionType,
-} from '~/stores/ReactionStore';
+import ReactionStore, { type ReactionType } from '~/stores/ReactionStore';
 
-import {
-  Util,
-} from '~/libs';
+import { Util } from '~/libs';
 
-import {
-  GetNewComment,
-  MakeNewReaction,
-} from '~/FakeData';
+import { IS_ANDROID, IS_IOS, WITH_NOTCH } from '~/Constants';
 
-type Props = $ReadOnly<{|
-|}>;
+import { GetNewComment, MakeNewReaction } from '~/FakeData';
+
+type Props = $ReadOnly<{||}>;
 
 type State = {|
   comments: Array<CommentType>,
@@ -63,7 +50,7 @@ export default class App extends PureComponent<Props, State> {
   _onLoadVideoPlayer = () => {
     this._addFakeComment();
     setTimeout(this._addFakeReaction, 1000);
-  }
+  };
 
   _addFakeComment = () => {
     const newComment = GetNewComment();
@@ -75,7 +62,10 @@ export default class App extends PureComponent<Props, State> {
       comments: CommentStore.add(newComment),
     });
 
-    this._addFakeCommentTimeoutID = setTimeout(this._addFakeComment, Util.getRandom(500, 1000));
+    this._addFakeCommentTimeoutID = setTimeout(
+      this._addFakeComment,
+      Util.getRandom(500, 1000),
+    );
   };
 
   _stopAddingFakeComment() {
@@ -86,18 +76,22 @@ export default class App extends PureComponent<Props, State> {
   }
 
   _addFakeReaction = () => {
-    const {
-      comments,
-    } = this.state;
+    const { comments } = this.state;
 
-    const commentsWithoutReaction = comments.filter(comment => comment.reactionImage === 0);
+    const commentsWithoutReaction = comments.filter(
+      comment => comment.reactionImage === 0,
+    );
     let targetComment = null;
 
     if (commentsWithoutReaction.length > 0) {
       targetComment = Util.getRandomInArray(commentsWithoutReaction);
     } else {
-      const lastReactionProfileImages = this.state.reactions.slice(-5).map(reaction => reaction.profileImage);
-      const unReactionComments = comments.filter(comment => lastReactionProfileImages.indexOf(comment.profileImage) === -1);
+      const lastReactionProfileImages = this.state.reactions
+        .slice(-5)
+        .map(reaction => reaction.profileImage);
+      const unReactionComments = comments.filter(
+        comment => lastReactionProfileImages.indexOf(comment.profileImage) === -1,
+      );
       targetComment = Util.getRandomInArray(unReactionComments);
     }
 
@@ -115,8 +109,11 @@ export default class App extends PureComponent<Props, State> {
       });
     }
 
-    this._addFakeReactionTimeoutID = setTimeout(this._addFakeReaction, Util.getRandom(300, 600));
-  }
+    this._addFakeReactionTimeoutID = setTimeout(
+      this._addFakeReaction,
+      Util.getRandom(300, 600),
+    );
+  };
 
   _stopAddingFakeReaction() {
     if (this._addFakeReactionTimeoutID) {
@@ -131,13 +128,29 @@ export default class App extends PureComponent<Props, State> {
 
   _onScrollStartVideoPlayer = () => {
     Keyboard.dismiss();
-  }
+  };
 
-  render() {
+  renderStatusBar = () => {
+    if (IS_ANDROID || (IS_IOS && !WITH_NOTCH)) {
+      return <StatusBar hidden />;
+    }
+    if (IS_IOS && WITH_NOTCH) {
+      return (
+        <StatusBar
+          // translucent
+          backgroundColor="#000"
+          barStyle="light-content"
+        />
+      );
+    }
+    return null;
+  };
+
+  renderChildren = () => {
     const { videoPlayerExpandingRate } = this.state;
-
     return (
-      <View style={styles.container}>
+      <Fragment>
+        <Fragment>{this.renderStatusBar()}</Fragment>
         <VideoPlayer
           onLoad={this._onLoadVideoPlayer}
           onScroll={this._onScrollVideoPlayer}
@@ -149,21 +162,41 @@ export default class App extends PureComponent<Props, State> {
           videoPlayerExpandingRate={videoPlayerExpandingRate}
         />
 
-        <CommentForm
-          videoPlayerExpandingRate={videoPlayerExpandingRate}
-        />
+        <CommentForm videoPlayerExpandingRate={videoPlayerExpandingRate} />
 
         <Reactions
           items={this.state.reactions}
           videoPlayerExpandingRate={videoPlayerExpandingRate}
         />
-      </View>
+      </Fragment>
     );
+  };
+
+  renderMainContent = () => {
+    if (IS_IOS && WITH_NOTCH) {
+      return (
+        <SafeAreaView
+          forceInset={{ top: 'always', bottom: 'never' }}
+          style={styles.safeAreaContainer}
+        >
+          {this.renderChildren()}
+        </SafeAreaView>
+      );
+    }
+    return <View style={styles.container}>{this.renderChildren()}</View>;
+  };
+
+  render() {
+    return this.renderMainContent();
   }
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  safeAreaContainer: {
+    flex: 1,
+    backgroundColor: '#000',
   },
 });
